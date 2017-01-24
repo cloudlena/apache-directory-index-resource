@@ -1,0 +1,62 @@
+#!/bin/bash
+# vim: set ft=sh
+
+set -e -u
+
+exec 3>&1 # make stdout available as fd 3 for the result
+exec 1>&2 # redirect all output to stderr for logging
+
+payload="$(mktemp "${TMPDIR}/apache-directory-index-resource.XXXXXX")"
+
+cat > "${payload}" <&0
+
+host="$(jq -r '.source.host // ""' < "${payload}")"
+directory="$(jq -r '.source.directory // ""' < "${payload}")"
+regexp="$(jq -r '.source.regexp // ""' < "${payload}")"
+old_ref="$(jq -r '.version.ref // ""' < "${payload}")"
+
+if [ -z "${old_ref}" ]; then
+  old_ref='0.0.0'
+fi
+
+html=$(curl "${host}/${directory}")
+
+versions_html=$(grep 'alt="\[DIR\]"' <<< "${html}") # extract folders in HTML
+versions=$(grep -o -E '([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-[a-z]*\.[0-9])?' <<< "${versions_html}") # extract semver versions from HTML
+versions_deduped=$(sort -u <<< "${versions}") # remove duplicates
+
+# Extract new versions
+new_versions_file="${payload}-new-versions"
+
+while read -r ver; do
+  if [ $(semver compare "${ver}" "${old_ref}") -eq 1 ]; then
+    echo "${ver}" >> "${new_versions_file}"
+  fi
+done <<< "$versions_deduped"
+
+# Sort new versions
+mapfile -t versions_sorted < "${new_versions_file}"
+
+for ((i=0; i <= $((${#versions_sorted[@]} - 2)); ++i)); do
+  for ((j=((i + 1)); j <= ((${#versions_sorted[@]} - 1)); ++j)); do
+    if [[ $(semver compare "${versions_sorted[i]}" "${versions_sorted[j]}") -eq 1 ]]; then
+      tmp=${versions_sorted[i]}
+      versions_sorted[i]=${versions_sorted[j]}
+      versions_sorted[j]=$tmp
+    fi
+  done
+done
+
+versions_json=''
+for ((i=0; i < $((${#versions_sorted[@]})); ++i)); do
+  versions_json="${versions_json},{\"ref\":\"${versions_sorted[i]}\"}"
+done
+
+versions_json="${versions_json#','}" # remove trailing comma
+versions_json="[${versions_json}]" # make JSON array
+
+if [ "${versions_json}" == '[]' ] && ! [ -z "${old_ref}" ]; then
+  versions_json="[{\"ref\":\"${old_ref}\"}]"
+fi
+
+jq -n "${versions_json}" >&3
