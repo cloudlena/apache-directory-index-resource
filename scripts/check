@@ -28,7 +28,7 @@ versions_deduped=$(sort -u <<< "${versions}") # remove duplicates
 new_versions_file="${payload}-new-versions"
 
 while read -r ver; do
-  if [ $(semver compare "${ver}" "${old_ref}") -eq 1 ]; then
+  if [ "$(semver compare "${ver}" "${old_ref}")" -eq 1 ]; then
     echo "${ver}" >> "${new_versions_file}"
   fi
 done <<< "$versions_deduped"
