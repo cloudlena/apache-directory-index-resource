@@ -1,0 +1,36 @@
+#!/bin/bash
+# vim: set ft=sh
+
+set -e
+
+exec 3>&1 # make stdout available as fd 3 for the result
+exec 1>&2 # redirect all output to stderr for logging
+
+destination=$1
+
+if [ -z "${destination}" ]; then
+  echo "usage: $0 <path/to/destination>" >&2
+  exit 1
+fi
+
+payload=$(mktemp "${TMPDIR}/apache-directory-index-resource.XXXXXX")
+
+cat > "${payload}" <&0
+
+host="$(jq -r '.source.host // ""' < "${payload}")"
+directory="$(jq -r '.source.directory // ""' < "${payload}")"
+folder_pattern="$(jq -r '.source.folder_pattern // ""' < "${payload}")"
+file_pattern="$(jq -r '.source.file_pattern // ""' < "${payload}")"
+version="$(jq -r '.version // ""' < "${payload}")"
+version_ref="$(echo "${version}" | jq -r '.ref // ""')"
+
+folder="${folder_pattern/\$VERSION/$version_ref}"
+file="${file_pattern/\$VERSION/$version_ref}"
+
+url="${host}/${directory}/${folder}/${file}"
+
+wget "${url}" -P "${destination}"
+
+jq -n "{
+  version: ${version}
+}" >&3
