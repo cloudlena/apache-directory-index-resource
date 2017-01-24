@@ -16,15 +16,15 @@ resources:
   type: apache-directory-index
   source:
     host: https://archive.apache.org
-    path: /dist/tomcat/tomcat-7
-    regexp: v(.*)/
-    file: bin/apache-tomcat-*.exe
+    directory: dist/tomcat/tomcat-7/
+    folder_pattern: v$VERSION
+    file_pattern: bin/apache-tomcat-$VERSION.tar.gz
 ```
 
 * `host` is the host of your Apache server
-* `path` is the path of where the your versioned folders reside
-* `regexp` is a regexp of the semver versions to be checked
-* `file` is the file to download (relative path to the versioned folder it resides in)
+* `directory` is the path of where the your versioned folders reside
+* `folder_pattern` describes the pattern of how the folders are named (use `$VERSION` as a placeholder for the semver version)
+* `file_pattern` describes the pattern of where the file resides and how it's named (use `$VERSION` as a placeholder for the semver version)
 
 ## Behavior
 

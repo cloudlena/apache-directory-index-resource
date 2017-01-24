@@ -12,7 +12,6 @@ cat > "${payload}" <&0
 
 host="$(jq -r '.source.host // ""' < "${payload}")"
 directory="$(jq -r '.source.directory // ""' < "${payload}")"
-regexp="$(jq -r '.source.regexp // ""' < "${payload}")"
 old_ref="$(jq -r '.version.ref // ""' < "${payload}")"
 
 if [ -z "${old_ref}" ]; then
