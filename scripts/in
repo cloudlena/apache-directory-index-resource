@@ -33,6 +33,9 @@ url="${host}/${directory}/${folder}/${file}"
 
 wget "${url}" -P "${destination}"
 
+echo "${version_ref}" > "${destination}/version"
+echo "${url}" > "${destination}/url"
+
 jq -n "{
   version: ${version}
 }" >&3
