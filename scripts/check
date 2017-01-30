@@ -23,7 +23,7 @@ fi
 html=$(curl "${host}/${directory}")
 
 versions_html=$(grep 'alt="\[DIR\]"' <<< "${html}") # extract folders in HTML
-versions=$(grep -o -E '([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-[a-z]*\.[0-9])?' <<< "${versions_html}") # extract semver versions from HTML
+versions=$(grep -o -E '([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-[a-z]*\.[0-9]*)?' <<< "${versions_html}") # extract semver versions from HTML
 versions_deduped=$(sort -u <<< "${versions}") # remove duplicates
 
 # Extract new versions
