@@ -7,6 +7,7 @@ exec 3>&1 # make stdout available as fd 3 for the result
 exec 1>&2 # redirect all output to stderr for logging
 
 TMPDIR=${TMPDIR:-/tmp}
+semver='(\d*)\.(\d*)\.(\d*)(-[a-z]*\.\d*)?'
 
 payload="$(mktemp "${TMPDIR}/apache-directory-index-resource.XXXXXX")"
 
@@ -23,7 +24,7 @@ fi
 html=$(curl "${host}/${directory}")
 
 versions_html=$(grep 'alt="\[DIR\]"' <<< "${html}") # extract folders in HTML
-versions=$(grep -o -E '([0-9]\d*)\.([0-9]\d*)\.([0-9]\d*)(-[a-z]*\.[0-9]*)?' <<< "${versions_html}") # extract semver versions from HTML
+versions=$(grep -o -E "${semver}" <<< "${versions_html}") # extract semver versions from HTML
 versions_deduped=$(sort -u <<< "${versions}") # remove duplicates
 
 # Extract new versions
