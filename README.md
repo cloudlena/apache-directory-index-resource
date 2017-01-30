@@ -34,7 +34,11 @@ Checks if there are new versions of the source.
 
 ### `in`: Download a version
 
-Downloads the latest source's file.
+Places the following files in the destination:
+
+* `(filename)`: The file fetched from the directory index
+* `url`: A file containing the URL of the file
+* `version`: The version identified in the file name
 
 ### `out`: Upload a version (not implemented)
 
