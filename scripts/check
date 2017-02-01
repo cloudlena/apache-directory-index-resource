@@ -15,10 +15,10 @@ cat > "${payload}" <&0
 
 host="$(jq -r '.source.host // ""' < "${payload}")"
 directory="$(jq -r '.source.directory // ""' < "${payload}")"
-old_ref="$(jq -r '.version.ref // ""' < "${payload}")"
+old_version="$(jq -r '.version.version // ""' < "${payload}")"
 
-if [ -z "${old_ref}" ]; then
-  old_ref='0.0.0'
+if [ -z "${old_version}" ]; then
+  old_version='0.0.0'
 fi
 
 html=$(curl "${host}/${directory}")
@@ -30,8 +30,9 @@ versions_deduped=$(sort -u <<< "${versions}") # remove duplicates
 # Extract new versions
 new_versions_file="${payload}-new-versions"
 
+touch "${new_versions_file}"
 while read -r ver; do
-  if [ "$(semver compare "${ver}" "${old_ref}")" -eq 1 ]; then
+  if [ "$(semver compare "${ver}" "${old_version}")" -eq 1 ]; then
     echo "${ver}" >> "${new_versions_file}"
   fi
 done <<< "$versions_deduped"
@@ -51,14 +52,14 @@ done
 
 versions_json=''
 for ((i=0; i < $((${#versions_sorted[@]})); ++i)); do
-  versions_json="${versions_json},{\"ref\":\"${versions_sorted[i]}\"}"
+  versions_json="${versions_json},{\"version\":\"${versions_sorted[i]}\"}"
 done
 
 versions_json="${versions_json#','}" # remove trailing comma
 versions_json="[${versions_json}]" # make JSON array
 
-if [ "${versions_json}" == '[]' ] && ! [ -z "${old_ref}" ]; then
-  versions_json="[{\"ref\":\"${old_ref}\"}]"
+if [ "${versions_json}" == '[]' ] && ! [ -z "${old_version}" ]; then
+  versions_json="[{\"version\":\"${old_version}\"}]"
 fi
 
 jq -n "${versions_json}" >&3
