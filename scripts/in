@@ -24,16 +24,16 @@ directory="$(jq -r '.source.directory // ""' < "${payload}")"
 folder_pattern="$(jq -r '.source.folder_pattern // ""' < "${payload}")"
 file_pattern="$(jq -r '.source.file_pattern // ""' < "${payload}")"
 version="$(jq -r '.version // ""' < "${payload}")"
-version_ref="$(echo "${version}" | jq -r '.ref // ""')"
+version_version="$(echo "${version}" | jq -r '.version // ""')"
 
-folder="${folder_pattern/\$VERSION/$version_ref}"
-file="${file_pattern/\$VERSION/$version_ref}"
+folder="${folder_pattern/\$VERSION/$version_version}"
+file="${file_pattern/\$VERSION/$version_version}"
 
 url="${host}/${directory}/${folder}/${file}"
 
 wget "${url}" -P "${destination}"
 
-echo "${version_ref}" > "${destination}/version"
+echo "${version_version}" > "${destination}/version"
 echo "${url}" > "${destination}/url"
 
 jq -n "{

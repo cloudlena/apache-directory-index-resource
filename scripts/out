@@ -20,5 +20,5 @@ payload=$(mktemp "${TMPDIR}/apache-directory-index-resource.XXXXXX")
 cat > "${payload}" <&0
 
 jq -n '{
-  version: {"ref":"0.0.0"}
+  version: {"version":"0.0.0"}
 }' >&3
