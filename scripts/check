@@ -13,7 +13,6 @@ payload="$(mktemp "${TMPDIR}/apache-directory-index-resource.XXXXXX")"
 
 cat > "${payload}" <&0
 
-host="$(jq -r '.source.host // ""' < "${payload}")"
 directory="$(jq -r '.source.directory // ""' < "${payload}")"
 old_version="$(jq -r '.version.version // ""' < "${payload}")"
 
@@ -21,7 +20,7 @@ if [ -z "${old_version}" ]; then
   old_version='0.0.0'
 fi
 
-html=$(curl "${host}/${directory}")
+html=$(curl "${directory}")
 
 versions_html=$(grep 'alt="\[DIR\]"' <<< "${html}") # extract folders in HTML
 versions=$(grep -o -E "${semver}" <<< "${versions_html}") # extract semver versions from HTML
