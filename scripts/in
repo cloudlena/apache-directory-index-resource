@@ -19,7 +19,6 @@ payload=$(mktemp "${TMPDIR}/apache-directory-index-resource.XXXXXX")
 
 cat > "${payload}" <&0
 
-host="$(jq -r '.source.host // ""' < "${payload}")"
 directory="$(jq -r '.source.directory // ""' < "${payload}")"
 folder_pattern="$(jq -r '.source.folder_pattern // ""' < "${payload}")"
 file_pattern="$(jq -r '.source.file_pattern // ""' < "${payload}")"
@@ -29,7 +28,7 @@ version_version="$(echo "${version}" | jq -r '.version // ""')"
 folder="${folder_pattern/\$VERSION/$version_version}"
 file="${file_pattern/\$VERSION/$version_version}"
 
-url="${host}/${directory}/${folder}/${file}"
+url="${directory}/${folder}/${file}"
 
 wget "${url}" -P "${destination}"
 
