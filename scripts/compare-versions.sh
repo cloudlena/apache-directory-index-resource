@@ -59,5 +59,3 @@ function compare_versions() {
   # No difference identified => versions are equal
   exit 0
 }
-
-compare_versions "$1" "$2"
