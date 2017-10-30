@@ -28,7 +28,7 @@ version_version="$(echo "${version}" | jq -r '.version // ""')"
 folder="${folder_pattern/\$VERSION/$version_version}"
 file="${file_pattern/\$VERSION/$version_version}"
 
-url="${directory}/${folder}/${file}"
+url="${directory}${folder}/${file}"
 
 wget "${url}" -P "${destination}"
 
