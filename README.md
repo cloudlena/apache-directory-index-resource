@@ -1,6 +1,6 @@
 # Apache Directory Index Resource
 
-A Concourse resource for the apache directory index.
+A Concourse resource for the Apache Directory Index.
 
 ## Source Configuration
 
@@ -28,7 +28,7 @@ resources:
 
 ## Behavior
 
-### `check`: Check for new folders
+### `check`: Check for new versions
 
 Checks if there are new versions of the source.
 
@@ -37,12 +37,8 @@ Checks if there are new versions of the source.
 Places the following files in the destination:
 
 * `(filename)`: The file fetched from the directory index
-* `url`: A file containing the URL of the downloaded file
+* `url`: Contains the URL of the downloaded file
 * `version`: The version identified in the file name
-
-### `out`: Upload a version (not implemented)
-
-Creates a new version and uploads its file.
 
 ## Example
 
