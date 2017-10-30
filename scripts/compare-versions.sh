@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 function compare_versions() {
   # Split version numbers into parts
   IFS='.' read -r -a split_1 <<< "$1"

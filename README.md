@@ -12,10 +12,10 @@ resource_types:
     repository: mastertinner/apache-directory-index-resource
 
 resources:
-- name: tomcat-7
+- name: tomcat-8
   type: apache-directory-index
   source:
-    directory: https://archive.apache.org/dist/tomcat/tomcat-7/
+    directory: https://archive.apache.org/dist/tomcat/tomcat-8/
     folder_pattern: v$VERSION
     file_pattern: bin/apache-tomcat-$VERSION.tar.gz
 ```
@@ -37,7 +37,7 @@ Checks if there are new versions of the source.
 Places the following files in the destination:
 
 * `(filename)`: The file fetched from the directory index
-* `url`: A file containing the URL of the file
+* `url`: A file containing the URL of the downloaded file
 * `version`: The version identified in the file name
 
 ### `out`: Upload a version (not implemented)
@@ -48,8 +48,8 @@ Creates a new version and uploads its file.
 
 ```yaml
 jobs:
-- name: download-tomcat-7
+- name: download-tomcat-8
   plan:
-  - get: tomcat-7
+  - get: tomcat-8
     trigger: true
 ```
