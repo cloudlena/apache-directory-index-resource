@@ -32,28 +32,36 @@ function compare_versions() {
     # Handle *-alpha, *-beta and *-rc
     if [[ "${num_1}" == *'-'* && "${num_2}" == *'-'* ]]; then
       if [[ "${num_1}" == *'-alpha'* ]]; then
-        exit 2
+        echo 2
+        return
       elif [[ "${num_2}" == *'-alpha'* ]]; then
-        exit 1
+        echo 1
+        return
       elif [[ "${num_1}" ==  *'-beta'* ]]; then
-        exit 2
+        echo 2
+        return
       else
-        exit 1
+        echo 1
+        return
       fi
     elif [[ "${num_1}" == *'-'* ]]; then
-      exit 2
+      echo 2
+      return
     elif [[ "${num_2}" == *'-'* ]]; then
-      exit 1
+      echo 1
+      return
     fi
 
     # If the two parts are just numbers, compare them directly
     if [ "${num_1}" -gt "${num_2}" ]; then
-      exit 1
+      echo 1
+      return
     else
-      exit 2
+      echo 2
+      return
     fi
   done
 
   # No difference identified => versions are equal
-  exit 0
+  echo 0
 }
