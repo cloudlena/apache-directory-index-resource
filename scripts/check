@@ -1,13 +1,15 @@
 #!/bin/bash
 # vim: set ft=sh
 
-set -e -u
+set -e
 
 exec 3>&1 # make stdout available as fd 3 for the result
 exec 1>&2 # redirect all output to stderr for logging
 
+source $(dirname $0)/compare-versions.sh
+
 TMPDIR=${TMPDIR:-/tmp}
-semver='[0-9]+\.[0-9]+\.[0-9]+([-+][a-z0-9]+\.[0-9]+)?'
+version_pattern='([0-9]+(-(alpha|beta|rc)(\.[0-9]+)?)?\.)+[0-9]+(-(alpha|beta|rc)(\.[0-9]+)?)?'
 
 payload="$(mktemp "${TMPDIR}/apache-directory-index-resource.XXXXXX")"
 
@@ -17,13 +19,13 @@ directory="$(jq -r '.source.directory // ""' < "${payload}")"
 old_version="$(jq -r '.version.version // ""' < "${payload}")"
 
 if [ -z "${old_version}" ]; then
-  old_version='0.0.0'
+  old_version='0'
 fi
 
 html=$(curl "${directory}")
 
 versions_html=$(grep 'alt="\[DIR\]"' <<< "${html}") # extract folders in HTML
-versions=$(grep -o -E "${semver}" <<< "${versions_html}") # extract semver versions from HTML
+versions=$(grep -o -E "${version_pattern}" <<< "${versions_html}") # extract versions from HTML
 versions_deduped=$(sort -u <<< "${versions}") # remove duplicates
 
 # Extract new versions
@@ -31,7 +33,7 @@ new_versions_file="${payload}-new-versions"
 
 touch "${new_versions_file}"
 while read -r ver; do
-  if [ "$(semver compare "${ver}" "${old_version}")" -eq 1 ]; then
+  if [ "$(compare_versions "${ver}" "${old_version}")" -eq 1 ]; then
     echo "${ver}" >> "${new_versions_file}"
   fi
 done <<< "$versions_deduped"
@@ -41,7 +43,7 @@ mapfile -t versions_sorted < "${new_versions_file}"
 
 for ((i=0; i <= $((${#versions_sorted[@]} - 2)); ++i)); do
   for ((j=((i + 1)); j <= ((${#versions_sorted[@]} - 1)); ++j)); do
-    if [[ $(semver compare "${versions_sorted[i]}" "${versions_sorted[j]}") -eq 1 ]]; then
+    if [[ $(compare_versions "${versions_sorted[i]}" "${versions_sorted[j]}") -eq 1 ]]; then
       tmp=${versions_sorted[i]}
       versions_sorted[i]=${versions_sorted[j]}
       versions_sorted[j]=$tmp
