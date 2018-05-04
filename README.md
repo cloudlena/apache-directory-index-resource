@@ -1,5 +1,8 @@
 # Apache Directory Index Resource
 
+![Docker Build Status](https://img.shields.io/docker/build/mastertinner/apache-directory-index-resource.svg)
+![Docker Pulls](https://img.shields.io/docker/pulls/mastertinner/apache-directory-index-resource.svg)
+
 A Concourse resource for the Apache Directory Index.
 
 ## Source Configuration
