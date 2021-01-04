@@ -19,6 +19,7 @@ payload=$(mktemp "${TMPDIR}/apache-directory-index-resource.XXXXXX")
 
 cat > "${payload}" <&0
 
+expand="$(jq -r '.source.expand // false' < "${payload}")"
 directory="$(jq -r '.source.directory // ""' < "${payload}")"
 folder_pattern="$(jq -r '.source.folder_pattern // ""' < "${payload}")"
 file_pattern="$(jq -r '.source.file_pattern // ""' < "${payload}")"
@@ -31,6 +32,11 @@ file="${file_pattern/\$VERSION/$version_version}"
 url="${directory}${folder}/${file}"
 
 wget "${url}" -P "${destination}"
+
+if ("${expand}" -eq "true"); then
+  mkdir -p "${destination}/expanded"
+  tar -xvf "${destination}/${file}" -C "${destination}/expanded"
+fi
 
 echo "${version_version}" > "${destination}/version"
 echo "${url}" > "${destination}/url"
