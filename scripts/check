@@ -59,7 +59,7 @@ done
 versions_json="${versions_json#','}" # remove trailing comma
 versions_json="[${versions_json}]" # make JSON array
 
-if [ "${versions_json}" == '[]' ] && ! [ -z "${old_version}" ]; then
+if [ "${versions_json}" == '[]' ] && [ -n "${old_version}" ]; then
   versions_json="[{\"version\":\"${old_version}\"}]"
 fi
 
