@@ -17,6 +17,7 @@ cat > "${payload}" <&0
 
 directory="$(jq -r '.source.directory // ""' < "${payload}")"
 old_version="$(jq -r '.version.version // ""' < "${payload}")"
+version_filter="$(jq -r '.source.version_filter // ""' < "${payload}")"
 
 if [ -z "${old_version}" ]; then
   old_version='0'
@@ -24,9 +25,10 @@ fi
 
 html=$(curl "${directory}")
 
-versions_html=$(grep 'alt="\[DIR\]"' <<< "${html}") # extract folders in HTML
+versions_html=$(echo "${html}" | pup 'a') # extract folders in HTML
 versions=$(grep -o -E "${version_pattern}" <<< "${versions_html}") # extract versions from HTML
-versions_deduped=$(sort -u <<< "${versions}") # remove duplicates
+filtered_versions=$(grep "${version_filter}" <<< "${versions}")
+versions_deduped=$(sort -u <<< "${filtered_versions}") # remove duplicates
 
 # Extract new versions
 new_versions_file="${payload}-new-versions"
